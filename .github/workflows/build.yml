@@ -1,25 +1,28 @@
-name: Build TWRP for TECNO KJ6
+name: Unpack and Build TWRP for TECNO KJ6
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  unpack_and_prepare:
     runs-on: ubuntu-22.04
     steps:
       - name: Download vendor_boot.img
         run: |
           wget -O vendor_boot.img https://files.catbox.moe/65c0hx.img
 
-      - name: Generate Device Tree
+      - name: Download magiskboot & Unpack vendor_boot
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip cpio libarchive-tools git
-          pip3 install twrpdtgen
-          python3 -m twrpdtgen vendor_boot.img -o device_tree
+          wget -O magisk.apk https://github.com
+          unzip -p magisk.apk lib/x86_64/libmagiskboot.so > magiskboot
+          chmod +x magiskboot
+          mkdir unpacked
+          cd unpacked
+          ../magiskboot unpack -h ../vendor_boot.img
+          ls -la
 
-      - name: Upload Device Tree Artifact
+      - name: Upload Unpacked Files
         uses: actions/upload-artifact@v4
         with:
-          name: twrp-device-tree-kj6
-          path: device_tree/
+          name: unpacked-vendor-boot-kj6
+          path: unpacked/
