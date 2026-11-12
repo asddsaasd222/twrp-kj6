@@ -11,15 +11,14 @@ jobs:
         run: |
           wget -O vendor_boot.img https://files.catbox.moe/65c0hx.img
 
-      - name: Download magiskboot & Unpack vendor_boot
+      - name: Download official unpack_bootimg & Unpack
         run: |
-          wget -O magisk.apk https://github.com
-          unzip -p magisk.apk lib/x86_64/libmagiskboot.so > magiskboot
-          chmod +x magiskboot
+          wget -O unpack_bootimg.py https://googlesource.com
+          base64 -d unpack_bootimg.py > unpack_bootimg
+          chmod +x unpack_bootimg
           mkdir unpacked
-          cd unpacked
-          ../magiskboot unpack -h ../vendor_boot.img
-          ls -la
+          python3 unpack_bootimg --boot_img vendor_boot.img --out unpacked
+          ls -la unpacked/
 
       - name: Upload Unpacked Files
         uses: actions/upload-artifact@v4
