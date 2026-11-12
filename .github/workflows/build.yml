@@ -1,0 +1,25 @@
+name: Build TWRP for TECNO KJ6
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download vendor_boot.img
+        run: |
+          wget -O vendor_boot.img https://files.catbox.moe/65c0hx.img
+
+      - name: Generate Device Tree
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip cpio libarchive-tools git
+          pip3 install twrpdtgen
+          python3 -m twrpdtgen vendor_boot.img -o device_tree
+
+      - name: Upload Device Tree Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp-device-tree-kj6
+          path: device_tree/
